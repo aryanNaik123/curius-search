@@ -13,9 +13,11 @@ Inspired by [apollo](https://github.com/amirgamil/apollo) and its [curius-search
 ```
 
 - Fetches all your Curius bookmarks via the public API
-- Embeds each bookmark (title + URL + highlights + tags + content) using `nomic-embed-text` (768 dims)
+- Embeds each bookmark (title + URL + highlights + tags + snippet) using `nomic-embed-text` (768 dims)
 - Stores vectors in memory with JSON file persistence
-- Searches via cosine similarity against the query embedding
+- **Hybrid search** — blends semantic cosine similarity (70%) with keyword matching (30%)
+- **Find similar** — discover related bookmarks using a bookmark's own embedding
+- **Search history** — recent queries saved locally with keyboard-navigable dropdown
 - Incremental updates — only embeds new bookmarks on subsequent runs
 
 ## Prerequisites
@@ -56,7 +58,8 @@ The server starts at **http://localhost:8990**. Search-as-you-type with 300ms de
 
 | Endpoint | Method | Description |
 |---|---|---|
-| `/api/search?q={query}&limit={n}` | GET | Semantic search, returns ranked results |
+| `/api/search?q={query}&limit={n}` | GET | Hybrid semantic + keyword search, returns ranked results |
+| `/api/similar?id={id}&limit={n}` | GET | Find bookmarks similar to a given bookmark |
 | `/api/status` | GET | Index stats and Ollama health |
 | `/api/reindex` | POST | Trigger background re-index |
 
