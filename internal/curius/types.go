@@ -3,14 +3,13 @@ package curius
 import "time"
 
 type Link struct {
-	ID          int        `json:"id"`
-	Title       string     `json:"title"`
-	URL         string     `json:"url"`
-	Highlights  []string   `json:"highlights"`
-	Tags        []Tag      `json:"tags"`
-	CreatedAt   time.Time  `json:"createdAt"`
-	Description string     `json:"description"`
-	Content     string     `json:"content"`
+	ID          int       `json:"id"`
+	Title       string    `json:"title"`
+	URL         string    `json:"url"`
+	Highlights  []string  `json:"highlights"`
+	Tags        []Tag     `json:"tags"`
+	CreatedAt   time.Time `json:"createdAt"`
+	Description string    `json:"description"`
 }
 
 type Tag struct {
@@ -24,27 +23,21 @@ type apiResponse struct {
 }
 
 type apiLink struct {
-	ID        int            `json:"id"`
-	Title     string         `json:"title"`
-	Link      string         `json:"link"`
-	Note      string         `json:"note"`
-	CreatedAt string         `json:"createdAt"`
-	Trails    []apiTrail     `json:"trails"`
-	Highlight []apiHighlight `json:"highlight"`
-	Metadata  *apiMetadata   `json:"metadata"`
+	ID          int            `json:"id"`
+	Title       string         `json:"title"`
+	Link        string         `json:"link"`
+	Snippet     string         `json:"snippet"`
+	CreatedDate string         `json:"createdDate"`
+	Topics      []apiTopic     `json:"topics"`
+	Highlights  []apiHighlight `json:"highlights"`
 }
 
-type apiTrail struct {
-	ID   int    `json:"id"`
-	Name string `json:"name"`
+type apiTopic struct {
+	ID    int    `json:"id"`
+	Topic string `json:"topic"`
 }
 
 type apiHighlight struct {
-	ID   int    `json:"id"`
-	Text string `json:"text"`
-}
-
-type apiMetadata struct {
-	Description string `json:"description"`
-	Content     string `json:"content"`
+	ID        int    `json:"id"`
+	Highlight string `json:"highlight"`
 }

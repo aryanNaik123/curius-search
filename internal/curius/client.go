@@ -67,34 +67,31 @@ func (c *Client) FetchAllLinks() ([]Link, error) {
 
 func convertLink(al apiLink) Link {
 	l := Link{
-		ID:    al.ID,
-		Title: al.Title,
-		URL:   al.Link,
+		ID:          al.ID,
+		Title:       al.Title,
+		URL:         al.Link,
+		Description: al.Snippet,
 	}
 
-	if al.CreatedAt != "" {
-		if t, err := time.Parse(time.RFC3339, al.CreatedAt); err == nil {
+	// createdDate is ISO 8601 with millis: "2026-02-20T15:53:23.083Z"
+	if al.CreatedDate != "" {
+		if t, err := time.Parse("2006-01-02T15:04:05.000Z", al.CreatedDate); err == nil {
+			l.CreatedAt = t
+		} else if t, err := time.Parse(time.RFC3339, al.CreatedDate); err == nil {
 			l.CreatedAt = t
 		}
 	}
 
-	for _, h := range al.Highlight {
-		if h.Text != "" {
-			l.Highlights = append(l.Highlights, h.Text)
+	for _, h := range al.Highlights {
+		if h.Highlight != "" {
+			l.Highlights = append(l.Highlights, h.Highlight)
 		}
 	}
 
-	for _, t := range al.Trails {
-		l.Tags = append(l.Tags, Tag{ID: t.ID, Name: t.Name})
-	}
-
-	if al.Metadata != nil {
-		l.Description = al.Metadata.Description
-		l.Content = al.Metadata.Content
-	}
-
-	if l.Description == "" {
-		l.Description = al.Note
+	for _, t := range al.Topics {
+		if t.Topic != "" {
+			l.Tags = append(l.Tags, Tag{ID: t.ID, Name: t.Topic})
+		}
 	}
 
 	return l

@@ -14,8 +14,6 @@ import (
 	"github.com/aryannaik/curius-search/internal/curius"
 )
 
-const maxEmbedTextLen = 6000
-
 type Store struct {
 	mu      sync.RWMutex
 	entries []IndexEntry
@@ -259,17 +257,6 @@ func BuildEmbeddingText(link curius.Link) string {
 	}
 	if len(link.Tags) > 0 {
 		b.WriteString("\n")
-	}
-
-	if link.Content != "" {
-		remaining := maxEmbedTextLen - b.Len()
-		if remaining > 0 {
-			content := link.Content
-			if len(content) > remaining {
-				content = content[:remaining]
-			}
-			b.WriteString(content)
-		}
 	}
 
 	return b.String()
