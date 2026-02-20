@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Curius Search</title>
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Curius Search</h1>
+            <p class="subtitle">Semantic search across your bookmarks</p>
+        </header>
+
+        <div class="search-box">
+            <input
+                type="text"
+                id="search-input"
+                placeholder="Search your bookmarks..."
+                autofocus
+                autocomplete="off"
+            >
+            <div id="status" class="status"></div>
+        </div>
+
+        <div id="results" class="results"></div>
+    </div>
+
+    <script src="/app.js"></script>
+</body>
+</html>

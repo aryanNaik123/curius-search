@@ -1,0 +1,6 @@
+.env
+data/
+/curius-search
+*.exe
+.DS_Store
+.claude/
