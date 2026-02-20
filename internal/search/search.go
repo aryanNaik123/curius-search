@@ -32,7 +32,7 @@ func NewSearcher(store *index.Store, embedClient *embeddings.Client) *Searcher {
 	}
 }
 
-// Search embeds the query and returns the top results.
+// Search embeds the query and returns the top results using hybrid scoring.
 func (s *Searcher) Search(query string, limit int) ([]Result, error) {
 	if limit <= 0 {
 		limit = 20
@@ -43,8 +43,26 @@ func (s *Searcher) Search(query string, limit int) ([]Result, error) {
 		return nil, fmt.Errorf("embed query: %w", err)
 	}
 
-	hits := s.store.Search(queryVec, limit)
+	hits := s.store.Search(queryVec, query, limit)
+	return hitsToResults(hits), nil
+}
 
+// FindSimilar returns bookmarks most similar to the given bookmark ID.
+func (s *Searcher) FindSimilar(id int, limit int) ([]Result, error) {
+	if limit <= 0 {
+		limit = 10
+	}
+
+	entry := s.store.GetByID(id)
+	if entry == nil {
+		return nil, fmt.Errorf("bookmark %d not found", id)
+	}
+
+	hits := s.store.SearchByVector(entry.Embedding, limit, id)
+	return hitsToResults(hits), nil
+}
+
+func hitsToResults(hits []index.SearchResult) []Result {
 	results := make([]Result, 0, len(hits))
 	for _, hit := range hits {
 		r := Result{
@@ -60,8 +78,7 @@ func (s *Searcher) Search(query string, limit int) ([]Result, error) {
 		r.Snippet = buildSnippet(hit.Entry)
 		results = append(results, r)
 	}
-
-	return results, nil
+	return results
 }
 
 func buildSnippet(entry index.IndexEntry) string {

@@ -15,6 +15,7 @@ func New(port string, staticDir string, store *index.Store, embedClient *embeddi
 
 	mux := http.NewServeMux()
 	mux.HandleFunc("/api/search", handlers.HandleSearch)
+	mux.HandleFunc("/api/similar", handlers.HandleSimilar)
 	mux.HandleFunc("/api/status", handlers.HandleStatus)
 	mux.HandleFunc("/api/reindex", handlers.HandleReindex)
 	mux.Handle("/", http.FileServer(http.Dir(staticDir)))

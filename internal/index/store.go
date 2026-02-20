@@ -122,14 +122,61 @@ func (s *Store) UpdatedAt() time.Time {
 	return info.ModTime()
 }
 
+// GetByID returns the entry with the given ID, or nil if not found.
+func (s *Store) GetByID(id int) *IndexEntry {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+	for i := range s.entries {
+		if s.entries[i].ID == id {
+			return &s.entries[i]
+		}
+	}
+	return nil
+}
+
 // SearchResult is a scored index entry from a search.
 type SearchResult struct {
 	Entry IndexEntry
 	Score float32
 }
 
-// Search finds the top-k entries most similar to the query vector.
-func (s *Store) Search(queryVec []float32, limit int) []SearchResult {
+const (
+	semanticWeight = 0.7
+	keywordWeight  = 0.3
+)
+
+// Search finds the top-k entries using hybrid scoring (cosine similarity + keyword match).
+func (s *Store) Search(queryVec []float32, query string, limit int) []SearchResult {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+
+	if len(s.entries) == 0 {
+		return nil
+	}
+
+	queryTerms := tokenize(query)
+
+	results := make([]SearchResult, 0, len(s.entries))
+	for _, entry := range s.entries {
+		cosine := cosineSimilarity(queryVec, entry.Embedding)
+		keyword := keywordScore(entry, queryTerms)
+		score := float32(semanticWeight)*cosine + float32(keywordWeight)*keyword
+		results = append(results, SearchResult{Entry: entry, Score: score})
+	}
+
+	sort.Slice(results, func(i, j int) bool {
+		return results[i].Score > results[j].Score
+	})
+
+	if limit > 0 && limit < len(results) {
+		results = results[:limit]
+	}
+
+	return results
+}
+
+// SearchByVector finds the top-k entries most similar to a vector (no keyword component).
+func (s *Store) SearchByVector(queryVec []float32, limit int, excludeID int) []SearchResult {
 	s.mu.RLock()
 	defer s.mu.RUnlock()
 
@@ -139,6 +186,9 @@ func (s *Store) Search(queryVec []float32, limit int) []SearchResult {
 
 	results := make([]SearchResult, 0, len(s.entries))
 	for _, entry := range s.entries {
+		if entry.ID == excludeID {
+			continue
+		}
 		score := cosineSimilarity(queryVec, entry.Embedding)
 		results = append(results, SearchResult{Entry: entry, Score: score})
 	}
@@ -152,6 +202,36 @@ func (s *Store) Search(queryVec []float32, limit int) []SearchResult {
 	}
 
 	return results
+}
+
+// keywordScore returns 0-1 based on what fraction of query terms appear in the entry's text fields.
+func keywordScore(entry IndexEntry, queryTerms []string) float32 {
+	if len(queryTerms) == 0 {
+		return 0
+	}
+
+	text := strings.ToLower(entry.Title + " " + entry.Description + " " + strings.Join(entry.Tags, " ") + " " + strings.Join(entry.Highlights, " "))
+
+	matched := 0
+	for _, term := range queryTerms {
+		if strings.Contains(text, term) {
+			matched++
+		}
+	}
+
+	return float32(matched) / float32(len(queryTerms))
+}
+
+// tokenize splits a query into lowercase terms, filtering short ones.
+func tokenize(s string) []string {
+	words := strings.Fields(strings.ToLower(s))
+	terms := make([]string, 0, len(words))
+	for _, w := range words {
+		if len(w) >= 2 {
+			terms = append(terms, w)
+		}
+	}
+	return terms
 }
 
 // BuildEmbeddingText creates the text to embed for a bookmark.

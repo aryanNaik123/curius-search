@@ -14,13 +14,16 @@
         </header>
 
         <div class="search-box">
-            <input
-                type="text"
-                id="search-input"
-                placeholder="Search your bookmarks..."
-                autofocus
-                autocomplete="off"
-            >
+            <div class="search-input-wrap">
+                <input
+                    type="text"
+                    id="search-input"
+                    placeholder="Search your bookmarks..."
+                    autofocus
+                    autocomplete="off"
+                >
+                <div id="history-dropdown" class="history-dropdown hidden"></div>
+            </div>
             <div id="status" class="status"></div>
         </div>
 

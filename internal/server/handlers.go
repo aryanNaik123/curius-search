@@ -76,6 +76,41 @@ func (h *Handlers) HandleStatus(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
+func (h *Handlers) HandleSimilar(w http.ResponseWriter, r *http.Request) {
+	idStr := r.URL.Query().Get("id")
+	if idStr == "" {
+		writeJSON(w, http.StatusBadRequest, map[string]string{"error": "missing query parameter 'id'"})
+		return
+	}
+
+	id, err := strconv.Atoi(idStr)
+	if err != nil {
+		writeJSON(w, http.StatusBadRequest, map[string]string{"error": "invalid id"})
+		return
+	}
+
+	limitStr := r.URL.Query().Get("limit")
+	limit := 10
+	if limitStr != "" {
+		if n, err := strconv.Atoi(limitStr); err == nil && n > 0 {
+			limit = n
+		}
+	}
+
+	results, err := h.searcher.FindSimilar(id, limit)
+	if err != nil {
+		log.Printf("Similar error: %v", err)
+		writeJSON(w, http.StatusNotFound, map[string]string{"error": err.Error()})
+		return
+	}
+
+	writeJSON(w, http.StatusOK, map[string]any{
+		"sourceId": id,
+		"results":  results,
+		"total":    len(results),
+	})
+}
+
 func (h *Handlers) HandleReindex(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		writeJSON(w, http.StatusMethodNotAllowed, map[string]string{"error": "method not allowed"})

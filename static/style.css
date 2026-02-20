@@ -183,3 +183,111 @@ header h1 {
     color: var(--muted);
     padding: 3rem 0;
 }
+
+/* Find similar button */
+.btn-similar {
+    font-size: 0.7rem;
+    padding: 0.1rem 0.5rem;
+    border-radius: 4px;
+    border: 1px solid var(--border);
+    background: var(--card-bg);
+    color: var(--muted);
+    cursor: pointer;
+    transition: color 0.15s, border-color 0.15s;
+}
+
+.btn-similar:hover {
+    color: var(--accent);
+    border-color: var(--accent);
+}
+
+/* Search history dropdown */
+.search-input-wrap {
+    position: relative;
+}
+
+.history-dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-top: none;
+    border-radius: 0 0 8px 8px;
+    z-index: 10;
+    max-height: 240px;
+    overflow-y: auto;
+}
+
+.history-dropdown.hidden {
+    display: none;
+}
+
+.history-item {
+    padding: 0.5rem 1rem;
+    font-size: 0.9rem;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: var(--fg);
+}
+
+.history-item:hover,
+.history-item.active {
+    background: var(--accent-light);
+}
+
+.history-item .history-remove {
+    font-size: 0.75rem;
+    color: var(--muted);
+    padding: 0.1rem 0.3rem;
+    border-radius: 3px;
+    opacity: 0;
+}
+
+.history-item:hover .history-remove {
+    opacity: 1;
+}
+
+.history-remove:hover {
+    color: var(--fg);
+    background: var(--border);
+}
+
+.history-label {
+    font-size: 0.7rem;
+    color: var(--muted);
+    padding: 0.4rem 1rem 0.2rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+/* Similar results context */
+.similar-banner {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 0.75rem;
+    margin-bottom: 0.75rem;
+    background: var(--accent-light);
+    border-radius: 6px;
+    font-size: 0.85rem;
+}
+
+.similar-banner .btn-back {
+    font-size: 0.75rem;
+    padding: 0.15rem 0.5rem;
+    border-radius: 4px;
+    border: 1px solid var(--border);
+    background: var(--card-bg);
+    color: var(--muted);
+    cursor: pointer;
+    margin-left: auto;
+}
+
+.similar-banner .btn-back:hover {
+    color: var(--accent);
+    border-color: var(--accent);
+}
